@@ -22,10 +22,14 @@
     }
     .line { opacity: 0; animation: show .01s linear forwards; }
     @keyframes show { to { opacity: 1; } }
+    .lid { font-size: 9px; }
+    .wink { opacity: 0; animation: wink 6s linear 4.2s infinite; }
+    @keyframes wink { 0%, 5% { opacity: 1; } 6%, 100% { opacity: 0; } }
     .cursor { fill: #c9d1d9; animation: blink 1s steps(1) infinite; }
     @keyframes blink { 50% { opacity: 0; } }
     @media (prefers-reduced-motion: reduce) {
       .col, .line, .cursor { animation: none; opacity: 1; transform: none; }
+      .wink { animation: none; opacity: 0; }
     }
     </style>
 <clipPath id="card"><rect width="1044" height="634" rx="12"/></clipPath>

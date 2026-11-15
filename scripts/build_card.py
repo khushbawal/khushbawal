@@ -137,6 +137,40 @@ def portrait_svg(grid: list, x0: float, y0: float) -> str:
     return "\n".join(out)
 
 
+# The eye that winks (his left eye, on the right of the picture), in grid cells.
+WINK_ROWS = (19, 21)       # first and last row, inclusive
+WINK_COLS = (32, 41)       # first and last column, inclusive
+WINK_START = 4.2           # seconds: after the rain has settled
+WINK_EVERY = 6             # seconds between winks
+
+
+def wink_svg(grid: list, x0: float, y0: float, bg: str) -> str:
+    """A closed eye drawn over the open one, shown for a blink every few seconds.
+
+    The cells are covered with the background colour, refilled with cheek
+    texture (copied from a few rows lower), and the middle row gets a
+    curved closed eyelid.
+    """
+    r0, r1 = WINK_ROWS
+    c0, c1 = WINK_COLS
+    mid = (r0 + r1) // 2
+    width = c1 - c0 + 1
+    lid = " ." + "_" * (width - 4) + ". "
+    out = [f'<rect x="{x0 + c0 * P_CW:.1f}" y="{y0 + (r0 - 1) * P_LH + 2.5:.1f}" '
+           f'width="{width * P_CW:.1f}" height="{(r1 - r0 + 1) * P_LH:.1f}" fill="{bg}"/>']
+    for r in range(r0, r1 + 1):
+        spans = []
+        for i, c in enumerate(range(c0, c1 + 1)):
+            if r == mid:
+                ch, lvl = lid[i], 2
+            else:
+                ch, lvl = grid[r + 4][c]  # cheek texture below the eye
+            if ch != " ":
+                spans.append(f'<tspan x="{x0 + c * P_CW:.1f}" y="{y0 + r * P_LH:.1f}" class="b{lvl}">{_esc(ch)}</tspan>')
+        out.append(f"<text class=\"lid\">{''.join(spans)}</text>")
+    return f'<g class="wink">{"".join(out)}</g>'
+
+
 def visible_info(stats: dict) -> list:
     # Hide the personal count while it is 0 (its contributions are private).
     return [i for i in INFO if not (i[0] == "stat" and "{personal_contrib}" in i[2] and not stats.get("personal_contrib"))]
@@ -198,10 +232,14 @@ def build(theme: str, stats: dict, grid: list) -> str:
     }}
     .line {{ opacity: 0; animation: show .01s linear forwards; }}
     @keyframes show {{ to {{ opacity: 1; }} }}
+    .lid {{ font-size: {P_FONT}px; }}
+    .wink {{ opacity: 0; animation: wink {WINK_EVERY}s linear {WINK_START}s infinite; }}
+    @keyframes wink {{ 0%, 5% {{ opacity: 1; }} 6%, 100% {{ opacity: 0; }} }}
     .cursor {{ fill: {t['fg']}; animation: blink 1s steps(1) infinite; }}
     @keyframes blink {{ 50% {{ opacity: 0; }} }}
     @media (prefers-reduced-motion: reduce) {{
       .col, .line, .cursor {{ animation: none; opacity: 1; transform: none; }}
+      .wink {{ animation: none; opacity: 0; }}
     }}
     """
     return (

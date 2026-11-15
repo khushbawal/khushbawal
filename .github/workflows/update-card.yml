@@ -1,0 +1,33 @@
+name: Update profile card
+
+on:
+  schedule:
+    - cron: "17 6 * * *"   # once a day
+  workflow_dispatch:        # run by hand from the Actions tab
+  push:
+    paths:
+      - "scripts/**"
+      - "assets/portrait.json"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build card.svg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/build_card.py
+      - name: Commit if anything changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add card.svg assets/stats.json
+          git diff --cached --quiet || git commit -m "Update profile card stats"
+          git push

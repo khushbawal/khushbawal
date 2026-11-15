@@ -1,4 +1,5 @@
 preview.html
 assets/portrait_preview.png
 __pycache__/
-assets/portrait.jpg
+assets/*.jpg
+assets/try*

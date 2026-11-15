@@ -250,6 +250,7 @@ def build(theme: str, stats: dict, grid: list) -> str:
         f'<g clip-path="url(#card)">\n'
         f'<rect width="{w:.0f}" height="{h:.0f}" fill="{t["bg"]}"/>\n'
         f"{portrait_svg(grid, PAD, PAD + P_LH)}\n"
+        f"{wink_svg(grid, PAD, PAD + P_LH, t['bg'])}\n"
         f"{info_svg(stats, ix, iy)}\n"
         f"</g>\n</svg>\n"
     )
